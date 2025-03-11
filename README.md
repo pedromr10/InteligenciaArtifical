@@ -1,4 +1,6 @@
 # Inteligência Artificial e Robótica (CC7711)
+Repositório direcionado aos laboratórios da matéria de IA. <br>
+7º semestre, FEI.
 
 ## Grupo
 
