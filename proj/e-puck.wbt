@@ -1,0 +1,72 @@
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/factory/containers/protos/WoodenBox.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/robots/gctronic/e-puck/protos/E-puck.proto"
+
+WorldInfo {
+  info [
+    "The model of the E-puck robot"
+  ]
+  title "E-puck simulation"
+}
+Viewpoint {
+  orientation -0.5773502691896258 0.5773502691896258 0.5773502691896258 2.0944
+  position -0.9343566643893757 0.07850292376578673 5.9607173548940375
+  follow "e-puck"
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+  translation 0 0 0.643571
+  floorSize 2 2
+}
+WoodenBox {
+  translation -0.131342 0.900274 0.05
+  rotation 0 0 1 0.5
+  size 0.1 0.1 0.1
+  mass -1
+}
+WoodenBox {
+  translation 0.35 0.75 0.05
+  rotation 0 0 1 4.96782
+  name "wooden box(1)"
+  size 0.1 0.1 0.1
+}
+WoodenBox {
+  translation -0.35471 -0.5 0.05
+  rotation 0 0 1 5.36782
+  name "wooden box(2)"
+  size 0.1 0.1 0.1
+}
+WoodenBox {
+  translation 0.36 0.3 0.05
+  rotation 0 0 1 5.36782
+  name "wooden box(3)"
+  size 0.1 0.1 0.1
+}
+WoodenBox {
+  translation -0.66 0.65 0.05
+  rotation 0 0 1 5.36782
+  name "wooden box(4)"
+  size 0.1 0.1 0.1
+}
+E-puck {
+  hidden position_0_0 4790.869319347583
+  hidden position_0_1 2722.934974748324
+  hidden linearVelocity_0 0.12550627830614955 0.0004983753377872022 5.26197212624277e-05
+  hidden angularVelocity_0 -0.001510471885783093 -0.005508226981911879 -0.0021573805857309693
+  hidden rotation_1 0 0.9999999999999999 0 3.082115276737964
+  hidden linearVelocity_1 0.12548875494455058 0.0004819847195023337 -1.1209352504527425e-05
+  hidden angularVelocity_1 -0.027438255763651474 6.274437670438081 0.0008232857861914182
+  hidden rotation_2 0 -0.9999999999999999 0 3.967448567616692
+  hidden linearVelocity_2 0.12548885442629024 0.0005298605812725763 -6.985017456530333e-06
+  hidden angularVelocity_2 -0.026296629125616023 6.27444274687658 0.00025724419701922684
+  translation -0.8782323458358622 0.08563577665683875 0.6435014860729869
+  rotation 0.06846165510113461 -0.008681385079876465 0.9976159758814552 0.004219040417909653
+  controller "my_controller"
+}
