@@ -16,7 +16,7 @@ void virar90graus(WbDeviceTag MotorEsquerdo, WbDeviceTag MotorDireito, bool vira
     // Para o robô:
     wb_motor_set_velocity(MotorEsquerdo, 0);
     wb_motor_set_velocity(MotorDireito, 0);
-  
+      
     // Faz com que o robô gire 90 graus para direita (aproximadamente 39 passos)
     for (float i = 0; i < 7.5; i++) {
       wb_robot_step(TIME_STEP);
@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
   double LeituraSensorProx[QtddSensoresProx];
   double AceleradorDireito = 1.0, AceleradorEsquerdo = 1.0;
   bool sairDoQuadrado = true;
-  
+
   wb_robot_init();
 
   // Motores:
@@ -110,6 +110,14 @@ int main(int argc, char **argv) {
     printf("\n");
 
     wb_led_set(Leds[0], wb_led_get(Leds[0]) * -1);
+    
+    if(LeituraSensorProx[5] > 50){
+      sairDoQuadrado = true;
+    }
+    
+    else if(LeituraSensorProx[2] > 50){
+      sairDoQuadrado = false;
+    }
 
     // Verifica o sensor da frente:
     if (LeituraSensorProx[0] > 100 && LeituraSensorProx[5] > 50){
