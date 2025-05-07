@@ -1,65 +1,54 @@
 #include <stdio.h>
+#include <math.h> // ADICIONADO
 #include <webots/robot.h>
 #include <webots/motor.h>
 #include <webots/distance_sensor.h>
 #include <webots/led.h>
+#include <webots/position_sensor.h> // ADICIONADO
 
 #define TIME_STEP 256
 #define QtddSensoresProx 8
 #define QtddLeds 10
+#define WHEEL_RADIUS 0.0205     // em metros
+#define AXLE_LENGTH 0.053       // distância entre rodas
 
 // Definindo a função para girar 90 graus
 void virar90graus(WbDeviceTag MotorEsquerdo, WbDeviceTag MotorDireito, bool virar) {
-  
   if(virar){
-  
-    // Para o robô:
     wb_motor_set_velocity(MotorEsquerdo, 0);
     wb_motor_set_velocity(MotorDireito, 0);
-      
-    // Faz com que o robô gire 90 graus para direita (aproximadamente 39 passos)
     for (float i = 0; i < 7.5; i++) {
       wb_robot_step(TIME_STEP);
-      wb_motor_set_velocity(MotorEsquerdo, 6.28 * 1);
-      wb_motor_set_velocity(MotorDireito, 6.28 * -1);
+      wb_motor_set_velocity(MotorEsquerdo, 6.28);
+      wb_motor_set_velocity(MotorDireito, -6.28);
     }
-    
     for (int j = 0; j < 5; j++) {
       wb_robot_step(TIME_STEP);
-      wb_motor_set_velocity(MotorEsquerdo, 6.28 * 1);
-      wb_motor_set_velocity(MotorDireito, 6.28 * 1);
+      wb_motor_set_velocity(MotorEsquerdo, 6.28);
+      wb_motor_set_velocity(MotorDireito, 6.28);
     }
-    
     for (float k = 0; k < 7; k++) {
       wb_robot_step(TIME_STEP);
-      wb_motor_set_velocity(MotorEsquerdo, 6.28 * 1);
-      wb_motor_set_velocity(MotorDireito, 6.28 * -1);
+      wb_motor_set_velocity(MotorEsquerdo, 6.28);
+      wb_motor_set_velocity(MotorDireito, -6.28);
     }
-  }
-  
-  else if(!virar){
-  
-    // Para o robô:
+  } else {
     wb_motor_set_velocity(MotorEsquerdo, 0);
     wb_motor_set_velocity(MotorDireito, 0);
-  
-    // Faz com que o robô gire 90 graus para esquerda (aproximadamente 39 passos)
     for (float i = 0; i < 7.5; i++) {
       wb_robot_step(TIME_STEP);
-      wb_motor_set_velocity(MotorEsquerdo, 6.28 * -1);
-      wb_motor_set_velocity(MotorDireito, 6.28 * 1);
+      wb_motor_set_velocity(MotorEsquerdo, -6.28);
+      wb_motor_set_velocity(MotorDireito, 6.28);
     }
-    
     for (int j = 0; j < 5; j++) {
       wb_robot_step(TIME_STEP);
-      wb_motor_set_velocity(MotorEsquerdo, 6.28 * 1);
-      wb_motor_set_velocity(MotorDireito, 6.28 * 1);
+      wb_motor_set_velocity(MotorEsquerdo, 6.28);
+      wb_motor_set_velocity(MotorDireito, 6.28);
     }
-    
     for (float k = 0; k < 7; k++) {
       wb_robot_step(TIME_STEP);
-      wb_motor_set_velocity(MotorEsquerdo, 6.28 * -1);
-      wb_motor_set_velocity(MotorDireito, 6.28 * 1);
+      wb_motor_set_velocity(MotorEsquerdo, -6.28);
+      wb_motor_set_velocity(MotorDireito, 6.28);
     }
   }
 }
@@ -75,25 +64,29 @@ int main(int argc, char **argv) {
   // Motores:
   WbDeviceTag MotorEsquerdo = wb_robot_get_device("left wheel motor");
   WbDeviceTag MotorDireito = wb_robot_get_device("right wheel motor");
-
   wb_motor_set_position(MotorEsquerdo, INFINITY);
   wb_motor_set_position(MotorDireito, INFINITY);
   wb_motor_set_velocity(MotorEsquerdo, 0);
   wb_motor_set_velocity(MotorDireito, 0);
 
+  // Encoders para posição:
+  WbDeviceTag left_encoder = wb_robot_get_device("left wheel sensor");
+  WbDeviceTag right_encoder = wb_robot_get_device("right wheel sensor");
+  wb_position_sensor_enable(left_encoder, TIME_STEP);
+  wb_position_sensor_enable(right_encoder, TIME_STEP);
+
+  // Odometria - Pegar posição relativa do robô:
+  double x = 0.0, z = 0.0, theta = 0.0;
+  double prev_left = 0.0, prev_right = 0.0;
+
   // Sensores de Proximidade:
   WbDeviceTag SensorProx[QtddSensoresProx];
-  SensorProx[0] = wb_robot_get_device("ps0");
-  SensorProx[1] = wb_robot_get_device("ps1");
-  SensorProx[2] = wb_robot_get_device("ps2");
-  SensorProx[3] = wb_robot_get_device("ps3");
-  SensorProx[4] = wb_robot_get_device("ps4");
-  SensorProx[5] = wb_robot_get_device("ps5");
-  SensorProx[6] = wb_robot_get_device("ps6");
-  SensorProx[7] = wb_robot_get_device("ps7");
-
-  for (i = 0; i < QtddSensoresProx; i++)
+  for (i = 0; i < QtddSensoresProx; i++) {
+    char nome[5];
+    sprintf(nome, "ps%d", i);
+    SensorProx[i] = wb_robot_get_device(nome);
     wb_distance_sensor_enable(SensorProx[i], TIME_STEP);
+  }
 
   // LED:
   WbDeviceTag Leds[QtddLeds];
@@ -110,44 +103,52 @@ int main(int argc, char **argv) {
     printf("\n");
 
     wb_led_set(Leds[0], wb_led_get(Leds[0]) * -1);
-    
-    if(LeituraSensorProx[5] > 50){
-      sairDoQuadrado = true;
-    }
-    
-    else if(LeituraSensorProx[2] > 50){
-      sairDoQuadrado = false;
-    }
 
-    // Verifica o sensor da frente:
+    // Lógica de colisão:
     if (LeituraSensorProx[0] > 100 && LeituraSensorProx[5] > 50){
-      // Chama a função para girar 90 graus
+      printf("\ntoquei em algo\n");
       virar90graus(MotorEsquerdo, MotorDireito, true);
       sairDoQuadrado = false;
-    } 
-    
-    else if(LeituraSensorProx[0] > 100 && LeituraSensorProx[2] > 50){
-      // Chama a função para girar 90 graus
+    } else if(LeituraSensorProx[0] > 100 && LeituraSensorProx[2] > 50){
+      printf("\ntoquei em algo\n");
       virar90graus(MotorEsquerdo, MotorDireito, false);
       sairDoQuadrado = true;
-    }
-    
-    else if(LeituraSensorProx[0] > 100 && sairDoQuadrado == true){
+    } else if(LeituraSensorProx[0] > 100 && sairDoQuadrado == true){
+      printf("\ntoquei em algo\n");
       virar90graus(MotorEsquerdo, MotorDireito, true);
       sairDoQuadrado = false;
-      printf("Direita");
-    }
-    else if(LeituraSensorProx[0] > 100 && sairDoQuadrado == false){
+      printf("Direita\n");
+    } else if(LeituraSensorProx[0] > 100 && sairDoQuadrado == false){
+      printf("\ntoquei em algo\n");
       virar90graus(MotorEsquerdo, MotorDireito, false);
       sairDoQuadrado = true;
-      printf("Esquerda");
-    }
-    else {
-      // Continua o movimento para frente
+      printf("Esquerda\n");
+    } else {
+      printf("\nnao toquei em nada\n");
       AceleradorDireito = 1;
       AceleradorEsquerdo = 1;
     }
 
+    // Atualização da odometria
+    double left_pos = wb_position_sensor_get_value(left_encoder);
+    double right_pos = wb_position_sensor_get_value(right_encoder);
+    double delta_left = left_pos - prev_left;
+    double delta_right = right_pos - prev_right;
+    prev_left = left_pos;
+    prev_right = right_pos;
+
+    double dl = delta_left * WHEEL_RADIUS;
+    double dr = delta_right * WHEEL_RADIUS;
+    double dc = (dl + dr) / 2.0;
+
+    theta += (dr - dl) / AXLE_LENGTH;
+    x += dc * cos(theta);
+    z += dc * sin(theta);
+
+    printf("Posição estimada -> x: %.3f m | z: %.3f m\n", x, z);
+    
+
+    // Movimento:
     wb_motor_set_velocity(MotorEsquerdo, 6.28 * AceleradorEsquerdo);
     wb_motor_set_velocity(MotorDireito, 6.28 * AceleradorDireito);
   }

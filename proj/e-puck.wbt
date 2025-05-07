@@ -1,9 +1,7 @@
 #VRML_SIM R2023b utf8
 
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/floors/protos/RectangleArena.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/robots/gctronic/e-puck/protos/E-puck.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/factory/containers/protos/WoodenBox.proto"
 
 WorldInfo {
@@ -13,45 +11,26 @@ WorldInfo {
   title "E-puck simulation"
 }
 Viewpoint {
-  orientation -0.5819195903902553 0.5739726894990177 0.5761292754489235 2.108086844511229
-  position -0.27482474327029255 -0.07962664302396862 4.130007550321256
+  orientation -0.13474327402396283 0.12929441640196387 0.9824088782134345 1.8854096739848636
+  position 1.6743599932388333 -4.788967799353806 2.421467591674539
   follow "e-puck"
 }
 TexturedBackground {
-}
-TexturedBackgroundLight {
 }
 RectangleArena {
   translation 0 0 0.643571
   floorSize 2 2
 }
-E-puck {
-  hidden position_0_0 9374.948235987122
-  hidden position_0_1 6567.52259647285
-  hidden linearVelocity_0 0.12525185571475067 -0.011040945421052134 -2.823833891520291e-06
-  hidden angularVelocity_0 0.0011276603359091518 0.008362160425479602 -0.0022725750847842814
-  hidden rotation_1 0 0.9999999999999999 0 0.43575767517871056
-  hidden linearVelocity_1 0.1252794145022736 -0.011085806397073104 -1.1844475155787223e-05
-  hidden angularVelocity_1 0.5538830097426599 6.2639883326128745 0.00028188760613589986
-  hidden rotation_2 0 -1 0 4.689234836997727
-  hidden linearVelocity_2 0.1252812983694542 -0.011005238757857352 -6.796625531402178e-06
-  hidden angularVelocity_2 0.553213945201668 6.264047374516715 -2.964953512614744e-05
-  translation -0.6524953533103728 -0.25251662026272836 0.643508052952167
-  rotation 0.001538165628697874 -0.00989434247517632 -0.9999498667600706 0.0880191926402827
-  controller "my_controller2"
-}
 WoodenBox {
   translation -0.5400045235651396 -0.6969455677297388 0.6931785999999999
-  rotation 0.9999999998356077 1.813241961266871e-05 2.4819860312370312e-17 3.141592653589793
+  rotation 0.9999999998356077 1.8132419612671082e-05 -5.0236303130358514e-18 3.141592653589793
   name "caixa_pesada"
   size 0.1 0.1 0.1
   mass 1
 }
 WoodenBox {
-  hidden linearVelocity_0 -2.007180580388801e-13 -3.65562095853791e-12 3.964801492286247e-15
-  hidden angularVelocity_0 7.31128383290081e-11 -4.014297829601613e-12 -2.905091417304665e-16
-  translation -0.7024815513308652 -0.1587383361784548 0.6935513799999995
-  rotation -1.7693141336779553e-10 5.01624154989205e-12 -1 0.05297201175010168
+  translation -0.7024815513308909 -0.15873833617892238 0.6935513799999998
+  rotation -1.757398688545764e-13 6.352897072438138e-15 -0.9999999999999999 0.05297201175010174
   name "caixa_leve"
   size 0.1 0.1 0.1
   mass 0.05
