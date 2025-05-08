@@ -12,9 +12,74 @@
 #define WHEEL_RADIUS 0.0205     // em metros
 #define AXLE_LENGTH 0.053       // distância entre rodas
 
+void caixaLeveEncontrada(){
+  printf("\n");
+  printf("CAIXA LEVE ENCONTRADA\n");
+  printf("\n");
+}
+
 // Definindo a função para girar 90 graus
-void virar90graus(WbDeviceTag MotorEsquerdo, WbDeviceTag MotorDireito, bool virar) {
-  if(virar){
+// Definindo a função para girar 90 graus
+void virar90graus(WbDeviceTag MotorEsquerdo, WbDeviceTag MotorDireito, bool virar, WbDeviceTag left_encoder, WbDeviceTag right_encoder) {
+
+
+  //odometria ANTES:
+  double xAntes = 0.0, zAntes = 0.0, thetaAntes = 0.0;
+  double prev_leftAntes = 0.0, prev_rightAntes = 0.0;
+  
+  double left_posAntes = wb_position_sensor_get_value(left_encoder);
+  double right_posAntes = wb_position_sensor_get_value(right_encoder);
+  double delta_leftAntes = left_posAntes - prev_leftAntes;
+  double delta_rightAntes = right_posAntes - prev_rightAntes;
+  prev_leftAntes = left_posAntes;
+  prev_rightAntes = right_posAntes;
+
+  double dlAntes = delta_leftAntes * WHEEL_RADIUS;
+  double drAntes = delta_rightAntes * WHEEL_RADIUS;
+  double dcAntes = (dlAntes + drAntes) / 2.0;
+
+  thetaAntes += (drAntes - dlAntes) / AXLE_LENGTH;
+  xAntes += dcAntes * cos(thetaAntes);
+  zAntes += dcAntes * sin(thetaAntes);
+
+  printf("ODOMETRIA ANTES -> x: %.4f m, z: %.4f m\n", xAntes, zAntes);
+
+
+  // Espera alguns passos com o motor andando
+  for (int i = 0; i < 5; i++) {
+    wb_robot_step(TIME_STEP);
+  }
+  
+  //odometria DEPOIS:
+  //double xDepois = 0.0, zDepois = 0.0, thetaDepois = 0.0;
+  double xDepois = xAntes, zDepois = zAntes, thetaDepois = 0.0;
+  double prev_leftDepois = 0.0, prev_rightDepois = 0.0;
+  
+  double left_posDepois = wb_position_sensor_get_value(left_encoder);
+  double right_posDepois = wb_position_sensor_get_value(right_encoder);
+  double delta_leftDepois = left_posDepois - prev_leftDepois;
+  double delta_rightDepois = right_posDepois - prev_rightDepois;
+  prev_leftDepois = left_posDepois;
+  prev_rightDepois = right_posDepois;
+
+  double dlDepois = delta_leftDepois * WHEEL_RADIUS;
+  double drDepois = delta_rightDepois * WHEEL_RADIUS;
+  double dcDepois = (dlDepois + drDepois) / 2.0;
+
+  thetaDepois += (drDepois - dlDepois) / AXLE_LENGTH;
+  xDepois += dcDepois * cos(thetaDepois);
+  zDepois += dcDepois * sin(thetaDepois);
+
+  printf("ODOMETRIA DEPOIS -> x: %.4f m, z: %.4f m\n", xDepois, zDepois);
+  printf("DIFERENCA ODOMETRIA (DEPOIS - ANTES) -> x: %.4f m, z: %.4f m\n", fabs(xDepois-xAntes), fabs(zDepois-zAntes));
+  
+  if(fabs(xDepois-xAntes)>=30.000){
+    caixaLeveEncontrada();
+  }
+
+
+  // lógica para virar
+  if (virar) {
     wb_motor_set_velocity(MotorEsquerdo, 0);
     wb_motor_set_velocity(MotorDireito, 0);
     for (float i = 0; i < 7.5; i++) {
@@ -27,7 +92,7 @@ void virar90graus(WbDeviceTag MotorEsquerdo, WbDeviceTag MotorDireito, bool vira
       wb_motor_set_velocity(MotorEsquerdo, 6.28);
       wb_motor_set_velocity(MotorDireito, 6.28);
     }
-    for (float k = 0; k < 7; k++) {
+    for (float k = 0; k < 7.5; k++) {
       wb_robot_step(TIME_STEP);
       wb_motor_set_velocity(MotorEsquerdo, 6.28);
       wb_motor_set_velocity(MotorDireito, -6.28);
@@ -45,13 +110,21 @@ void virar90graus(WbDeviceTag MotorEsquerdo, WbDeviceTag MotorDireito, bool vira
       wb_motor_set_velocity(MotorEsquerdo, 6.28);
       wb_motor_set_velocity(MotorDireito, 6.28);
     }
-    for (float k = 0; k < 7; k++) {
+    for (float k = 0; k < 7.5; k++) {
       wb_robot_step(TIME_STEP);
       wb_motor_set_velocity(MotorEsquerdo, -6.28);
       wb_motor_set_velocity(MotorDireito, 6.28);
     }
   }
 }
+
+
+
+
+
+
+
+
 
 int main(int argc, char **argv) {
   int i = 0;
@@ -75,9 +148,7 @@ int main(int argc, char **argv) {
   wb_position_sensor_enable(left_encoder, TIME_STEP);
   wb_position_sensor_enable(right_encoder, TIME_STEP);
 
-  // Odometria - Pegar posição relativa do robô:
-  double x = 0.0, z = 0.0, theta = 0.0;
-  double prev_left = 0.0, prev_right = 0.0;
+
 
   // Sensores de Proximidade:
   WbDeviceTag SensorProx[QtddSensoresProx];
@@ -94,41 +165,19 @@ int main(int argc, char **argv) {
   wb_led_set(Leds[0], -1);
 
   while (wb_robot_step(TIME_STEP) != -1) {
+  
     // Leitura dos sensores:
-    printf("Sensor: ");
+    //printf("Sensor: ");
     for (i = 0; i < QtddSensoresProx; i++) {
       LeituraSensorProx[i] = wb_distance_sensor_get_value(SensorProx[i]) - 60;
-      printf("%d: %.2f | ", i, LeituraSensorProx[i]);
+      //printf("%d: %.2f | ", i, LeituraSensorProx[i]);
     }
-    printf("\n");
-
-    wb_led_set(Leds[0], wb_led_get(Leds[0]) * -1);
-
-    // Lógica de colisão:
-    if (LeituraSensorProx[0] > 100 && LeituraSensorProx[5] > 50){
-      printf("\ntoquei em algo\n");
-      virar90graus(MotorEsquerdo, MotorDireito, true);
-      sairDoQuadrado = false;
-    } else if(LeituraSensorProx[0] > 100 && LeituraSensorProx[2] > 50){
-      printf("\ntoquei em algo\n");
-      virar90graus(MotorEsquerdo, MotorDireito, false);
-      sairDoQuadrado = true;
-    } else if(LeituraSensorProx[0] > 100 && sairDoQuadrado == true){
-      printf("\ntoquei em algo\n");
-      virar90graus(MotorEsquerdo, MotorDireito, true);
-      sairDoQuadrado = false;
-      printf("Direita\n");
-    } else if(LeituraSensorProx[0] > 100 && sairDoQuadrado == false){
-      printf("\ntoquei em algo\n");
-      virar90graus(MotorEsquerdo, MotorDireito, false);
-      sairDoQuadrado = true;
-      printf("Esquerda\n");
-    } else {
-      printf("\nnao toquei em nada\n");
-      AceleradorDireito = 1;
-      AceleradorEsquerdo = 1;
-    }
-
+    //printf("\n");
+    
+    // Odometria - Pegar posição relativa do robô:
+    double x = 0.0, z = 0.0, theta = 0.0;
+    double prev_left = 0.0, prev_right = 0.0;
+    
     // Atualização da odometria
     double left_pos = wb_position_sensor_get_value(left_encoder);
     double right_pos = wb_position_sensor_get_value(right_encoder);
@@ -145,7 +194,33 @@ int main(int argc, char **argv) {
     x += dc * cos(theta);
     z += dc * sin(theta);
 
-    printf("Posição estimada -> x: %.3f m | z: %.3f m\n", x, z);
+    printf("ODOMETRIA -> x: %.4f m, z: %.4f m\n", x, z);
+
+
+    // Lógica de colisão:
+    if (LeituraSensorProx[0] > 100 && LeituraSensorProx[5] > 50){
+      printf("\ntoquei em algo\n");
+      virar90graus(MotorEsquerdo, MotorDireito, true, left_encoder, right_encoder); //editado aqui
+      sairDoQuadrado = false;
+    } else if(LeituraSensorProx[0] > 100 && LeituraSensorProx[2] > 50){
+      printf("\ntoquei em algo\n");
+      virar90graus(MotorEsquerdo, MotorDireito, false, left_encoder, right_encoder);
+      sairDoQuadrado = true;
+    } else if(LeituraSensorProx[0] > 100 && sairDoQuadrado == true){
+      printf("\ntoquei em algo\n");
+      virar90graus(MotorEsquerdo, MotorDireito, true, left_encoder, right_encoder);
+      sairDoQuadrado = false;
+      printf("Direita\n");
+    } else if(LeituraSensorProx[0] > 100 && sairDoQuadrado == false){
+      printf("\ntoquei em algo\n");
+      virar90graus(MotorEsquerdo, MotorDireito, false, left_encoder, right_encoder);
+      sairDoQuadrado = true;
+      printf("Esquerda\n");
+    } else {
+      printf("\nnao toquei em nada\n");
+      AceleradorDireito = 1;
+      AceleradorEsquerdo = 1;
+    }
     
 
     // Movimento:
