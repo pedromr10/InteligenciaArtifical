@@ -12,11 +12,24 @@
 #define WHEEL_RADIUS 0.0205     // em metros
 #define AXLE_LENGTH 0.053       // distância entre rodas
 
-void caixaLeveEncontrada(){
+void caixaLeveEncontrada() {
   printf("\n");
   printf("CAIXA LEVE ENCONTRADA\n");
   printf("\n");
+
+  // Obtém os motores
+  WbDeviceTag MotorEsquerdo = wb_robot_get_device("left wheel motor");
+  WbDeviceTag MotorDireito = wb_robot_get_device("right wheel motor");
+
+  // Faz o robô girar no próprio eixo indefinidamente
+  wb_motor_set_velocity(MotorEsquerdo, 6.28);
+  wb_motor_set_velocity(MotorDireito, -6.28);
+
+  while (true) {
+    wb_robot_step(TIME_STEP);
+  }
 }
+
 
 // Definindo a função para girar 90 graus
 // Definindo a função para girar 90 graus
