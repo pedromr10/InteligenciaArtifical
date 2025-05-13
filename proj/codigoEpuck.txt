@@ -1,15 +1,15 @@
 #include <stdio.h>
-#include <math.h> // ADICIONADO
+#include <math.h> //ADICIONADO
 #include <webots/robot.h>
 #include <webots/motor.h>
 #include <webots/distance_sensor.h>
 #include <webots/led.h>
-#include <webots/position_sensor.h> // ADICIONADO
+#include <webots/position_sensor.h> //ADICIONADO
 
 #define TIME_STEP 256
 #define QtddSensoresProx 8
 #define QtddLeds 10
-#define WHEEL_RADIUS 0.0205     // em metros
+#define WHEEL_RADIUS 0.0205     //em m
 #define AXLE_LENGTH 0.053       // distância entre rodas
 
 void caixaLeveEncontrada() {
@@ -17,11 +17,11 @@ void caixaLeveEncontrada() {
   printf("CAIXA LEVE ENCONTRADA\n");
   printf("\n");
 
-  // Obtém os motores
+  //pega os motores
   WbDeviceTag MotorEsquerdo = wb_robot_get_device("left wheel motor");
   WbDeviceTag MotorDireito = wb_robot_get_device("right wheel motor");
 
-  // Faz o robô girar no próprio eixo indefinidamente
+  // robo gira noproprio eixo
   wb_motor_set_velocity(MotorEsquerdo, 6.28);
   wb_motor_set_velocity(MotorDireito, -6.28);
 
@@ -31,8 +31,7 @@ void caixaLeveEncontrada() {
 }
 
 
-// Definindo a função para girar 90 graus
-// Definindo a função para girar 90 graus
+//funcao pra girar 90 graus:
 void virar90graus(WbDeviceTag MotorEsquerdo, WbDeviceTag MotorDireito, bool virar, WbDeviceTag left_encoder, WbDeviceTag right_encoder) {
 
 
@@ -58,7 +57,7 @@ void virar90graus(WbDeviceTag MotorEsquerdo, WbDeviceTag MotorDireito, bool vira
   printf("ODOMETRIA ANTES -> x: %.4f m, z: %.4f m\n", xAntes, zAntes);
 
 
-  // Espera alguns passos com o motor andando
+  // espera o robo dar uma avançada pra frente:
   for (int i = 0; i < 5; i++) {
     wb_robot_step(TIME_STEP);
   }
@@ -86,7 +85,7 @@ void virar90graus(WbDeviceTag MotorEsquerdo, WbDeviceTag MotorDireito, bool vira
   printf("ODOMETRIA DEPOIS -> x: %.4f m, z: %.4f m\n", xDepois, zDepois);
   printf("DIFERENCA ODOMETRIA (DEPOIS - ANTES) -> x: %.4f m, z: %.4f m\n", fabs(xDepois-xAntes), fabs(zDepois-zAntes));
   
-  if(fabs(xDepois-xAntes)>=30.000){
+  if(fabs(xDepois-xAntes)>=30.000){ //variavel para mudanca
     caixaLeveEncontrada();
   }
 
@@ -172,11 +171,6 @@ int main(int argc, char **argv) {
     wb_distance_sensor_enable(SensorProx[i], TIME_STEP);
   }
 
-  // LED:
-  WbDeviceTag Leds[QtddLeds];
-  Leds[0] = wb_robot_get_device("led0");
-  wb_led_set(Leds[0], -1);
-
   while (wb_robot_step(TIME_STEP) != -1) {
   
     // Leitura dos sensores:
@@ -187,7 +181,7 @@ int main(int argc, char **argv) {
     }
     //printf("\n");
     
-    // Odometria - Pegar posição relativa do robô:
+    // Odometria - pra pode pegar a posicao do robo, mas nao a posicao exata:
     double x = 0.0, z = 0.0, theta = 0.0;
     double prev_left = 0.0, prev_right = 0.0;
     
@@ -210,7 +204,7 @@ int main(int argc, char **argv) {
     printf("ODOMETRIA -> x: %.4f m, z: %.4f m\n", x, z);
 
 
-    // Lógica de colisão:
+    // Lógica de colisao:
     if (LeituraSensorProx[0] > 100 && LeituraSensorProx[5] > 50){
       printf("\ntoquei em algo\n");
       virar90graus(MotorEsquerdo, MotorDireito, true, left_encoder, right_encoder); //editado aqui
@@ -236,7 +230,7 @@ int main(int argc, char **argv) {
     }
     
 
-    // Movimento:
+    //Movimento:
     wb_motor_set_velocity(MotorEsquerdo, 6.28 * AceleradorEsquerdo);
     wb_motor_set_velocity(MotorDireito, 6.28 * AceleradorDireito);
   }
